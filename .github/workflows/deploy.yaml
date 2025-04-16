@@ -5,29 +5,38 @@ on:
     branches:
       - prod
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
-      - uses: actions/checkout@v4
-      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.12"
-      
+          python-version: '3.12'
+
       - name: Install dependencies
         run: pip install -r requirements.txt
 
       - name: Build docs
-        run: |
-          mkdocs build --config-file docs/mkdocs.yml --site-dir public
-      
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v3
+        run: mkdocs build --config-file docs/mkdocs.yml --site-dir public
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          publish_dir: ./public
+          path: public
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v3
