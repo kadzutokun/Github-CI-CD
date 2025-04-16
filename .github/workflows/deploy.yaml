@@ -2,16 +2,16 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - prod
+    branches: [prod]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    
     steps:
       - uses: actions/checkout@v4
       
@@ -21,18 +21,28 @@ jobs:
           python-version: "3.12"
       
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
 
-      - name: Build docs
+      - name: Build documentation
         run: |
           mkdocs build --config-file docs/mkdocs.yml
-      
+          
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: ./public
-      
+          path: "public"
+
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v3
-        with:
-          publish_dir: ./public
