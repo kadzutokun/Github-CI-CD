@@ -1,4 +1,4 @@
-name: Production CI/CD Pipeline
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -6,33 +6,25 @@ on:
       - prod
 
 jobs:
-  lint-and-test:
+  deploy:
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    
     steps:
       - uses: actions/checkout@v4
       
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Run linting with Ruff
-        run: ruff check .
-
-      - name: Run unit tests
-        run: pytest tests/
-
-  deploy-prod:
-    needs: lint-and-test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
       
-      - name: Deploy to Production
-        run: |
-          scp -r ./src user@prod-server:/opt/app
-          ssh user@prod-server "sudo systemctl restart app-prod"
+      - name: Install dependencies
+        run: pip install requirements.txt
+
+      - name: Build docs
+        run: mkdocs build
+      
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v3
