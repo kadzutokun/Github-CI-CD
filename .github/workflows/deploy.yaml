@@ -14,7 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
       - name: Checkout code
@@ -31,19 +30,11 @@ jobs:
       - name: Build MkDocs site
         run: mkdocs build --config-file docs/mkdocs.yml --site-dir public
 
-      - name: Preload upload-artifact (workaround)
-        uses: actions/upload-artifact@v3
-        with:
-          name: dummy
-          path: .gitignore
-          retention-days: 1
-          if-no-files-found: ignore
-      
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v2.0.0
+        uses: actions/upload-pages-artifact@v1  # <–– используем v1, т.к. v2 зависит от upload-artifact@v3
         with:
           path: public
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v3.0.1
+        uses: actions/deploy-pages@v2  # <–– откат на v2, без зависимости от upload-artifact@v3
