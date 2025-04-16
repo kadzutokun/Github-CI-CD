@@ -25,7 +25,7 @@ jobs:
 
       - name: Build docs
         run: |
-          mkdocs build --config-file docs/mkdocs.yml --site-dir public
+          mkdocs build --config-file docs/mkdocs.yml
       
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v3
