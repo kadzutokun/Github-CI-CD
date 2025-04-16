@@ -10,7 +10,7 @@ permissions:
   id-token: write
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -24,20 +24,20 @@ jobs:
         with:
           python-version: "3.12"
       
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+      - name: Install MkDocs
+        run: pip install mkdocs
 
       - name: Build docs
         run: |
-          
-          mkdocs build --config-file docs/mkdocs.yml
+          # Явно указываем путь для сборки
+          mkdocs build --config-file docs/mkdocs.yml --site-dir public
 
-      - name: Upload Pages Artifact
+      - name: Upload and Deploy
         uses: actions/upload-pages-artifact@v2
         with:
           path: 'public'
       
-      - name: Deploy to GitHub Pages
-        id: deployment
+      - name: Final Deploy
         uses: actions/deploy-pages@v3
+        with:
+          artifact_name: github-pages-artifact
