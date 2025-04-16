@@ -1,0 +1,38 @@
+name: Production CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - prod
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run linting with Ruff
+        run: ruff check .
+
+      - name: Run unit tests
+        run: pytest tests/
+
+  deploy-prod:
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to Production
+        run: |
+          scp -r ./src user@prod-server:/opt/app
+          ssh user@prod-server "sudo systemctl restart app-prod"
