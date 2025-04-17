@@ -33,8 +33,8 @@ jobs:
 
       - name: Build docs
         run: |
-          mkdocs build --config-file docs/mkdocs.yml --site-dir public
-          echo "📂 Contents of public:"
+          mkdocs build --config-file docs/mkdocs.yml --site-dir docs/public
+          echo "📂 Contents of docs/public:"
           ls -al docs/public
 
       - name: Upload GitHub Pages artifact
