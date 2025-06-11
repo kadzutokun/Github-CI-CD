@@ -33,7 +33,7 @@ jobs:
 
       - name: Build docs
         run: |
-          run: mkdocs build --site-dir site
+          mkdocs build --site-dir site
           echo "📂 Contents of site:"
           ls -al site
 
